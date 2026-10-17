@@ -34,12 +34,26 @@ function Contatos() {
     <Shell>
       <PageHeader title="Contatos" subtitle="Todos recebem o alerta ao mesmo tempo" />
       <div className="mx-4 -mt-4 space-y-3">
+        <section className="rounded-3xl bg-card p-4 shadow-soft">
+          <p className="flex items-center gap-2 text-lg font-bold"><PhoneCall className="h-5 w-5 text-fever" /> Ligação de emergência</p>
+          <p className="text-sm text-muted-foreground">Toque em quem será chamado pelo botão "Ligar" durante um alerta.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {contacts.filter((c) => c.phone).map((c) => (
+              <button key={c.id} onClick={() => setEmergency(c.id)} aria-pressed={emergency === c.id}
+                className={`rounded-full px-4 py-2 font-bold ${emergency === c.id ? "bg-fever text-primary-foreground" : "bg-muted"}`}>
+                {emergency === c.id ? "✓ " : ""}{c.name}
+              </button>
+            ))}
+            {!contacts.some((c) => c.phone) && <p className="text-sm text-muted-foreground">Adicione um contato com celular.</p>}
+          </div>
+        </section>
         {contacts.map((c) => (
           <div key={c.id} className="flex items-center gap-3 rounded-3xl bg-card p-4 shadow-soft">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cold-soft text-cold"><UserRound className="h-6 w-6" /></span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-lg font-bold">{c.name}</p>
               <p className="truncate text-sm text-muted-foreground">{c.role}{c.phone && ` • ${c.phone}`}</p>
+              {emergency === c.id && <span className="mt-1 inline-block rounded-full bg-fever-soft px-2 py-0.5 text-xs font-bold text-fever">📞 Emergência</span>}
             </div>
             <button role="switch" aria-checked={c.active} aria-label={`Alertas para ${c.name}`}
               onClick={() => setContacts(contacts.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)))}
@@ -47,7 +61,7 @@ function Contatos() {
               <span className={`absolute top-1 h-6 w-6 rounded-full bg-card transition-all ${c.active ? "left-7" : "left-1"}`} />
             </button>
             {c.id !== "1" && (
-              <button aria-label={`Remover ${c.name}`} onClick={() => setContacts(contacts.filter((x) => x.id !== c.id))} className="p-2 text-fever">
+              <button aria-label={`Remover ${c.name}`} onClick={() => { setContacts(contacts.filter((x) => x.id !== c.id)); if (emergency === c.id) setEmergency(""); }} className="p-2 text-fever">
                 <Trash2 className="h-5 w-5" />
               </button>
             )}

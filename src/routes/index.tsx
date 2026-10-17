@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Battery, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
+import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { WeekChart } from "@/components/WeekChart";
-import { usePersisted } from "@/lib/store";
+import { useAuth, usePersisted } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +28,8 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [contacts] = usePersisted("contacts");
   const [device] = usePersisted("device");
+  const auth = useAuth();
+  const nav = useNavigate();
 
   const temp = mode === "normal" ? 32.8 : mode === "hot" ? 37.1 : 28.5;
   const state: Mode = temp > hi ? "hot" : temp < lo ? "cold" : "normal";
@@ -60,12 +62,18 @@ function Index() {
             <h1 className="text-3xl font-extrabold">PéGuard</h1>
             <p className="text-sm opacity-70">by FootSense</p>
           </div>
-          <div className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-base font-bold">
-            <Battery className="h-5 w-5" /> 88%
+          <div className="flex items-center gap-2">
+            <div className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-base font-bold">
+              <Battery className="h-5 w-5" /> 88%
+            </div>
+            <button onClick={() => { auth.logout(); nav({ to: "/login", replace: true }); }} aria-label="Sair"
+              className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-base font-bold">
+              <LogOut className="h-5 w-5" /> Sair
+            </button>
           </div>
         </div>
-        <p className="mt-5 text-2xl font-bold">Olá, Sr. Carlos 👋</p>
-        <p className="opacity-80">62 anos • Calcanhar direito</p>
+        <p className="mt-5 text-2xl font-bold">Olá, {auth.user?.name ?? "Sr. Carlos"} 👋</p>
+        <p className="opacity-80">{auth.user?.age ? `${auth.user.age} anos` : "62 anos"} • Calcanhar direito</p>
         <div className="mt-4 flex flex-wrap gap-2 text-sm">
           <Link to="/conectar" className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5">
             <Bluetooth className="h-4 w-4" />{device.connected ? "Palmilha conectada • DS18B20" : "Palmilha desconectada"}

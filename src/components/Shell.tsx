@@ -1,8 +1,13 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Bluetooth, Home, Users } from "lucide-react";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useAuth } from "@/lib/store";
 
 export function Shell({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
+  const { ready, user } = useAuth();
+  const nav = useNavigate();
+  useEffect(() => { if (ready && !user) nav({ to: "/login", replace: true }); }, [ready, user, nav]);
+  if (!ready || !user) return <div className="min-h-screen bg-shell" />;
   return (
     <div className="flex min-h-screen justify-center bg-shell sm:py-8">
       <main className="relative w-full max-w-[430px] overflow-hidden bg-background pb-44 sm:rounded-[2.75rem] sm:border-[10px] sm:border-clinical-soft">

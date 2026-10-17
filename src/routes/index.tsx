@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { WeekChart } from "@/components/WeekChart";
+import { AlertSim } from "@/components/AlertSim";
 import { useAuth, usePersisted } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
@@ -22,6 +23,7 @@ const fmt = (n: number) => n.toFixed(1).replace(".", ",");
 
 function Index() {
   const [mode, setMode] = useState<Mode>("normal");
+  const [alertKey, setAlertKey] = useState(0);
   const [hi, setHi] = useState(35.5);
   const [lo, setLo] = useState(29.5);
   const [freq, setFreq] = useState(15);
@@ -45,7 +47,7 @@ function Index() {
       <p className="mb-1.5 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Simulador • Pitch</p>
       <div className="grid grid-cols-3 gap-1.5">
         {([["normal", "Normal", "32,8°", "bg-success"], ["hot", "Quente", "37,1°", "bg-fever"], ["cold", "Frio", "28,5°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
-          <button key={m} onClick={() => setMode(m)}
+          <button key={m} onClick={() => { setMode(m); setAlertKey((k) => k + 1); }}
             className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
             {l} {v}
           </button>
@@ -139,6 +141,10 @@ function Index() {
           <span className="text-lg font-bold">Ajustes clínicos (médico)</span><Settings2 className="h-6 w-6" />
         </button>
       </section>
+
+      {alertKey > 0 && state !== "normal" && (
+        <AlertSim key={alertKey} kind={state} temp={fmt(temp)} contacts={contacts} onClose={() => setAlertKey(0)} />
+      )}
 
       {open && (
         <div className="fixed inset-0 z-20 flex items-end justify-center bg-shell/70 backdrop-blur-sm" onClick={() => setOpen(false)}>

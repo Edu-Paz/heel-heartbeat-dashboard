@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Trash2, UserRound } from "lucide-react";
+import { PhoneCall, Plus, Trash2, UserRound } from "lucide-react";
 import { PageHeader, Shell } from "@/components/Shell";
 import { usePersisted } from "@/lib/store";
 
@@ -20,6 +20,7 @@ const roles: string[] = ["Filho(a)", "Cônjuge", "Cuidador(a)", "Médico", "Enfe
 
 function Contatos() {
   const [contacts, setContacts] = usePersisted("contacts");
+  const [emergency, setEmergency] = usePersisted("emergency");
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: "", role: roles[0]!, phone: "" });
   const valid = form.name.trim().length > 1 && form.phone.replace(/\D/g, "").length >= 10;

@@ -84,6 +84,14 @@ function Index() {
         </div>
       </header>
 
+      {!device.connected ? (
+        <section className="relative mx-4 -mt-4 rounded-3xl bg-card p-6 text-center shadow-soft">
+          <Bluetooth className="mx-auto h-10 w-10 text-muted-foreground" />
+          <p className="mt-2 text-xl font-extrabold">Palmilha desconectada</p>
+          <p className="text-muted-foreground">Conecte a palmilha para ver a temperatura atual.</p>
+          <Link to="/conectar" className="mt-4 inline-flex min-h-12 items-center rounded-2xl bg-clinical px-5 font-bold text-primary-foreground">Conectar palmilha</Link>
+        </section>
+      ) : (
       <section className="relative mx-4 -mt-4 rounded-3xl bg-card p-5 shadow-soft">
         <div className={`flex items-center gap-3 rounded-2xl p-3 ${t.soft}`} role="alert">
           <span className={`h-3 w-3 shrink-0 rounded-full ${t.bg}`} />
@@ -108,6 +116,7 @@ function Index() {
           </div>
         </div>
       </section>
+      )}
 
       <section className="mx-4 mt-6">
         <h2 className="text-xl font-bold">Média de hoje</h2>
@@ -142,7 +151,7 @@ function Index() {
         </button>
       </section>
 
-      {alertKey > 0 && state !== "normal" && (
+      {alertKey > 0 && device.connected && state !== "normal" && (
         <AlertSim key={alertKey} kind={state} temp={fmt(temp)} contacts={contacts} onClose={() => setAlertKey(0)} />
       )}
 

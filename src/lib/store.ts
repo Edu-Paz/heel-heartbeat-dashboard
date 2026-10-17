@@ -9,6 +9,7 @@ const defaults = {
     { id: "3", name: "Dr. Silva", role: "Médico (Endocrinologista)", phone: "", active: true },
   ] as Contact[],
   device: { connected: true, name: "Palmilha FootSense #A47" },
+  emergency: "2" as string,
 };
 
 export function usePersisted<K extends keyof typeof defaults>(key: K) {

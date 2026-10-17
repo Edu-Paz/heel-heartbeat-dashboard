@@ -21,7 +21,8 @@ function beep(kind: Kind) {
   } catch { /* sem áudio */ }
 }
 
-export function AlertSim({ kind, temp, contacts, onClose }: { kind: Kind; temp: string; contacts: Contact[]; onClose: () => void }) {
+export function AlertSim({ kind, temp, contacts, emergencyId, onClose }: { kind: Kind; temp: string; contacts: Contact[]; emergencyId?: string; onClose: () => void }) {
+  const emergency = contacts.find((c) => c.id === emergencyId && c.phone);
   const [stage, setStage] = useState<"banner" | "full">("banner");
   const [sent, setSent] = useState(0);
   const [ack, setAck] = useState(false);
@@ -87,7 +88,11 @@ export function AlertSim({ kind, temp, contacts, onClose }: { kind: Kind; temp: 
         </div>
 
         <div className="mt-auto grid gap-2 pt-6">
-          <a href="tel:53991234567" className="flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-card text-lg font-bold text-foreground"><Phone className="h-6 w-6" /> Ligar para cuidador</a>
+          {emergency?.phone ? (
+            <a href={`tel:${emergency.phone.replace(/\D/g, "")}`} className="flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-card text-lg font-bold text-foreground"><Phone className="h-6 w-6" /> Ligar para {emergency.name}</a>
+          ) : (
+            <p className="rounded-2xl bg-card/15 p-3 text-center font-bold">Nenhum contato de emergência definido</p>
+          )}
           <button onClick={() => (ack ? onClose() : setAck(true))} className="min-h-16 rounded-2xl border-2 border-card text-lg font-bold">
             {ack ? "Fechar" : "✅ Já verifiquei meu pé"}
           </button>

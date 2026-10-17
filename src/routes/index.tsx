@@ -30,6 +30,7 @@ function Index() {
   const [open, setOpen] = useState(false);
   const [contacts] = usePersisted("contacts");
   const [device] = usePersisted("device");
+  const [emergency] = usePersisted("emergency");
   const auth = useAuth();
   const nav = useNavigate();
 
@@ -152,7 +153,7 @@ function Index() {
       </section>
 
       {alertKey > 0 && device.connected && state !== "normal" && (
-        <AlertSim key={alertKey} kind={state} temp={fmt(temp)} contacts={contacts} onClose={() => setAlertKey(0)} />
+        <AlertSim key={alertKey} kind={state} temp={fmt(temp)} contacts={contacts} emergencyId={emergency} onClose={() => setAlertKey(0)} />
       )}
 
       {open && (

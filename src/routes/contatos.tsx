@@ -16,17 +16,17 @@ export const Route = createFileRoute("/contatos")({
   component: Contatos,
 });
 
-const roles = ["Filho(a)", "Cônjuge", "Cuidador(a)", "Médico", "Enfermeiro(a)", "Outro"];
+const roles: string[] = ["Filho(a)", "Cônjuge", "Cuidador(a)", "Médico", "Enfermeiro(a)", "Outro"];
 
 function Contatos() {
   const [contacts, setContacts] = usePersisted("contacts");
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", role: roles[0], phone: "" });
+  const [form, setForm] = useState({ name: "", role: roles[0]!, phone: "" });
   const valid = form.name.trim().length > 1 && form.phone.replace(/\D/g, "").length >= 10;
 
   const save = () => {
     setContacts([...contacts, { ...form, id: String(Date.now()), active: true }]);
-    setForm({ name: "", role: roles[0], phone: "" });
+    setForm({ name: "", role: roles[0]!, phone: "" });
     setAdding(false);
   };
 

@@ -37,7 +37,7 @@ export function WeekChart({ hi, lo }: { hi: number; lo: number }) {
       </div>
       <div className="mt-4 space-y-2">
         {series.map((s) => {
-          const diff = s.v[6] - s.v[0];
+          const diff = s.v[6]! - s.v[0]!;
           const msg = Math.abs(diff) < 0.5 ? "estável" : diff > 0 ? `subiu ${c(diff)} °C` : `caiu ${c(-diff)} °C`;
           return (
             <div key={s.k} className="flex items-center justify-between rounded-2xl bg-muted px-4 py-3">

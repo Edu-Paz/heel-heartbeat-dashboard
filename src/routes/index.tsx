@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLiveTemp } from "@/lib/mqtt";
 import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { WeekChart } from "@/components/WeekChart";
@@ -33,9 +34,18 @@ function Index() {
   const [emergency] = usePersisted("emergency");
   const auth = useAuth();
   const nav = useNavigate();
+  const [useReal, setUseReal] = useState(true);
+  const live = useLiveTemp(useReal && device.connected);
+  const real = useReal && live.temp !== null;
 
-  const temp = mode === "normal" ? 32.8 : mode === "hot" ? 37.1 : 28.5;
+  const simTemp = mode === "normal" ? 32.8 : mode === "hot" ? 37.1 : 28.5;
+  const temp = real ? live.temp! : simTemp;
   const state: Mode = temp > hi ? "hot" : temp < lo ? "cold" : "normal";
+  const prevState = useRef<Mode>("normal");
+  useEffect(() => {
+    if (real && state !== "normal" && prevState.current === "normal") setAlertKey((k) => k + 1);
+    prevState.current = state;
+  }, [state, real]);
   const t = {
     normal: { bg: "bg-success", soft: "bg-success-soft", text: "text-success", fill: "fill-success", title: "Tudo certo", msg: "Temperatura normal no calcanhar." },
     hot: { bg: "bg-fever", soft: "bg-fever-soft", text: "text-fever", fill: "fill-fever", title: "Ponto quente!", msg: "Possível inflamação. Cuidadores avisados." },
@@ -45,10 +55,19 @@ function Index() {
 
   const footer = (
     <div className="mx-3 mb-2 rounded-2xl border bg-card/95 p-2 shadow-soft backdrop-blur">
-      <p className="mb-1.5 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Simulador • Pitch</p>
+      <div className="mb-1.5 flex items-center justify-between gap-2 px-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <span>
+          {useReal
+            ? live.status === "online" ? (live.temp !== null ? `Placa ao vivo • ${fmt(live.temp)}°` : "Broker ok • aguardando placa") : live.status === "error" ? "Erro no broker" : "Conectando broker…"
+            : "Simulador • Pitch"}
+        </span>
+        <button onClick={() => setUseReal((v) => !v)} className="rounded-full bg-muted px-2 py-1 normal-case tracking-normal text-foreground">
+          {useReal ? "Usar simulador" : "Usar placa real"}
+        </button>
+      </div>
       <div className="grid grid-cols-3 gap-1.5">
         {([["normal", "Normal", "32,8°", "bg-success"], ["hot", "Quente", "37,1°", "bg-fever"], ["cold", "Frio", "28,5°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
-          <button key={m} onClick={() => { setMode(m); setAlertKey((k) => k + 1); }}
+          <button key={m} onClick={() => { setUseReal(false); setMode(m); setAlertKey((k) => k + 1); }}
             className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
             {l} {v}
           </button>

@@ -11,9 +11,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "PéGuard — Painel do Paciente" },
-      { name: "description", content: "Temperatura do calcanhar em tempo real, médias por período e alertas para cuidadores." },
+      { name: "description", content: "Temperatura do peito do pé em tempo real, médias por período e alertas para cuidadores." },
       { property: "og:title", content: "PéGuard — Painel do Paciente" },
-      { property: "og:description", content: "Temperatura do calcanhar em tempo real e alertas multicuidador." },
+      { property: "og:description", content: "Temperatura do peito do pé em tempo real e alertas multicuidador." },
     ],
   }),
   component: Index,
@@ -25,8 +25,8 @@ const fmt = (n: number) => n.toFixed(1).replace(".", ",");
 function Index() {
   const [mode, setMode] = useState<Mode>("normal");
   const [alertKey, setAlertKey] = useState(0);
-  const [hi, setHi] = useState(35.5);
-  const [lo, setLo] = useState(29.5);
+  const [hi, setHi] = useState(33);
+  const [lo, setLo] = useState(27);
   const [freq, setFreq] = useState(15);
   const [open, setOpen] = useState(false);
   const [contacts] = usePersisted("contacts");
@@ -38,7 +38,7 @@ function Index() {
   const live = useLiveTemp(useReal && device.connected);
   const real = useReal && live.temp !== null;
 
-  const simTemp = mode === "normal" ? 32.8 : mode === "hot" ? 37.1 : 28.5;
+  const simTemp = mode === "normal" ? 30.2 : mode === "hot" ? 34.6 : 25.8;
   const temp = real ? live.temp! : simTemp;
   const state: Mode = temp > hi ? "hot" : temp < lo ? "cold" : "normal";
   const prevState = useRef<Mode>("normal");
@@ -47,7 +47,7 @@ function Index() {
     prevState.current = state;
   }, [state, real]);
   const t = {
-    normal: { bg: "bg-success", soft: "bg-success-soft", text: "text-success", fill: "fill-success", title: "Tudo certo", msg: "Temperatura normal no calcanhar." },
+    normal: { bg: "bg-success", soft: "bg-success-soft", text: "text-success", fill: "fill-success", title: "Tudo certo", msg: "Temperatura normal no peito do pé." },
     hot: { bg: "bg-fever", soft: "bg-fever-soft", text: "text-fever", fill: "fill-fever", title: "Ponto quente!", msg: "Possível inflamação. Cuidadores avisados." },
     cold: { bg: "bg-cold", soft: "bg-cold-soft", text: "text-cold", fill: "fill-cold", title: "Pé muito frio", msg: "Possível má circulação. Aqueça o pé." },
   }[state];
@@ -66,7 +66,7 @@ function Index() {
         </button>
       </div>
       <div className="grid grid-cols-3 gap-1.5">
-        {([["normal", "Normal", "32,8°", "bg-success"], ["hot", "Quente", "37,1°", "bg-fever"], ["cold", "Frio", "28,5°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
+        {([["normal", "Normal", "30,2°", "bg-success"], ["hot", "Quente", "34,6°", "bg-fever"], ["cold", "Frio", "25,8°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
           <button key={m} onClick={() => { setUseReal(false); setMode(m); setAlertKey((k) => k + 1); }}
             className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
             {l} {v}
@@ -95,7 +95,7 @@ function Index() {
           </div>
         </div>
         <p className="mt-5 text-2xl font-bold">Olá, {auth.user?.name ?? "Sr. Carlos"} 👋</p>
-        <p className="opacity-80">{auth.user?.age ? `${auth.user.age} anos` : "62 anos"} • Calcanhar direito</p>
+        <p className="opacity-80">{auth.user?.age ? `${auth.user.age} anos` : "62 anos"} • Peito do pé direito</p>
         <div className="mt-4 flex flex-wrap gap-2 text-sm">
           <Link to="/conectar" className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5">
             <Bluetooth className="h-4 w-4" />{device.connected ? "Palmilha conectada • DS18B20" : "Palmilha desconectada"}
@@ -126,8 +126,8 @@ function Index() {
             {[[72, 40, 14], [100, 32, 11], [122, 34, 10], [141, 42, 9], [156, 56, 8]].map(([x, y, r]) => (
               <circle key={x} cx={x} cy={y} r={r} className="fill-muted stroke-border" strokeWidth="2" />
             ))}
-            <circle cx="107" cy="240" r="30" className={`${t.fill} pulse-ring`} style={{ transformOrigin: "107px 240px" }} />
-            <circle cx="107" cy="240" r="30" className={t.fill} />
+            <circle cx="104" cy="150" r="26" className={`${t.fill} pulse-ring`} style={{ transformOrigin: "104px 150px" }} />
+            <circle cx="104" cy="150" r="26" className={t.fill} />
           </svg>
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Agora</p>
@@ -142,9 +142,9 @@ function Index() {
         <h2 className="text-xl font-bold">Média de hoje</h2>
         <div className="mt-3 grid grid-cols-3 gap-2">
           {[
-            { i: "🌅", n: "Manhã", h: "06–12h", v: 32.2, s: "Normal", c: "bg-success-soft text-success" },
-            { i: "☀️", n: "Tarde", h: "12–18h", v: 36.8, s: "Quente", c: "bg-warn-soft text-warn" },
-            { i: "🌙", n: "Noite", h: "18–00h", v: 28.9, s: "Baixa", c: "bg-cold-soft text-cold" },
+            { i: "🌅", n: "Manhã", h: "06–12h", v: 30.1, s: "Normal", c: "bg-success-soft text-success" },
+            { i: "☀️", n: "Tarde", h: "12–18h", v: 33.8, s: "Quente", c: "bg-warn-soft text-warn" },
+            { i: "🌙", n: "Noite", h: "18–00h", v: 26.4, s: "Baixa", c: "bg-cold-soft text-cold" },
           ].map((p) => (
             <div key={p.n} className="rounded-3xl bg-card p-3 text-center shadow-soft">
               <div className="text-2xl">{p.i}</div>

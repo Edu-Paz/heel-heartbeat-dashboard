@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useLiveTemp } from "@/lib/mqtt";
-import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
+import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer, SlidersHorizontal } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { WeekChart } from "@/components/WeekChart";
 import { AlertSim } from "@/components/AlertSim";
@@ -29,6 +29,7 @@ function Index() {
   const [lo, setLo] = useState(27);
   const [freq, setFreq] = useState(15);
   const [open, setOpen] = useState(false);
+  const [simOpen, setSimOpen] = useState(false);
   const [contacts] = usePersisted("contacts");
   const [device] = usePersisted("device");
   const [emergency] = usePersisted("emergency");
@@ -54,25 +55,34 @@ function Index() {
   const active = contacts.filter((c) => c.active).length;
 
   const footer = (
-    <div className="mx-3 mb-2 rounded-2xl border bg-card/95 p-2 shadow-soft backdrop-blur">
-      <div className="mb-1.5 flex items-center justify-between gap-2 px-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-        <span>
-          {useReal
-            ? live.status === "online" ? (live.temp !== null ? `Placa ao vivo • ${fmt(live.temp)}°` : "Broker ok • aguardando placa") : live.status === "error" ? "Erro no broker" : "Conectando broker…"
-            : "Simulador • Pitch"}
-        </span>
-        <button onClick={() => setUseReal((v) => !v)} className="rounded-full bg-muted px-2 py-1 normal-case tracking-normal text-foreground">
-          {useReal ? "Usar simulador" : "Usar placa real"}
-        </button>
-      </div>
-      <div className="grid grid-cols-3 gap-1.5">
-        {([["normal", "Normal", "30,2°", "bg-success"], ["hot", "Quente", "34,6°", "bg-fever"], ["cold", "Frio", "25,8°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
-          <button key={m} onClick={() => { setUseReal(false); setMode(m); setAlertKey((k) => k + 1); }}
-            className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
-            {l} {v}
-          </button>
-        ))}
-      </div>
+    <div className="mx-3 mb-2">
+      {simOpen && (
+        <div className="mb-2 rounded-2xl border bg-card/95 p-2 shadow-soft backdrop-blur">
+          <div className="mb-1.5 flex items-center justify-between gap-2 px-1 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            <span>
+              {useReal
+                ? live.status === "online" ? (live.temp !== null ? `Placa ao vivo • ${fmt(live.temp)}°` : "Broker ok • aguardando placa") : live.status === "error" ? "Erro no broker" : "Conectando broker…"
+                : "Simulador • Pitch"}
+            </span>
+            <button onClick={() => setUseReal((v) => !v)} className="rounded-full bg-muted px-2 py-1 normal-case tracking-normal text-foreground">
+              {useReal ? "Usar simulador" : "Usar placa real"}
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {([["normal", "Normal", "30,2°", "bg-success"], ["hot", "Quente", "34,6°", "bg-fever"], ["cold", "Frio", "25,8°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
+              <button key={m} onClick={() => { setUseReal(false); setMode(m); setAlertKey((k) => k + 1); }}
+                className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
+                {l} {v}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <button onClick={() => setSimOpen((v) => !v)} aria-label={simOpen ? "Fechar simulador" : "Abrir simulador"}
+        className="ml-auto flex items-center gap-1.5 rounded-full border border-border/40 bg-card/60 px-2.5 py-1.5 text-muted-foreground/60 opacity-40 transition hover:opacity-80 active:scale-95">
+        <span className={`h-1.5 w-1.5 rounded-full ${useReal ? (live.status === "online" && live.temp !== null ? "bg-success" : "bg-muted-foreground/40") : "bg-warn"}`} />
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 

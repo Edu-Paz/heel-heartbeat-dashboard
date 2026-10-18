@@ -1,16 +1,16 @@
 import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const days = ["Sáb", "Dom", "Seg", "Ter", "Qua", "Qui", "Hoje"];
-const manha = [32.0, 32.4, 31.9, 32.3, 32.1, 32.5, 32.2];
-const tarde = [34.1, 34.8, 35.2, 35.9, 36.1, 36.4, 36.8];
-const noite = [30.2, 29.8, 30.0, 29.5, 29.3, 29.1, 28.9];
+const manha = [30.0, 30.3, 29.8, 30.2, 30.1, 30.4, 30.1];
+const tarde = [31.2, 31.8, 32.3, 32.8, 33.1, 33.5, 33.8];
+const noite = [28.4, 28.0, 27.6, 27.3, 27.0, 26.7, 26.4];
 const data = days.map((d, i) => ({ d, manha: manha[i], tarde: tarde[i], noite: noite[i] }));
 const c = (n: number) => n.toFixed(1).replace(".", ",");
 
 const series = [
-  { k: "manha", l: "🌅 Manhã", color: "var(--success)", v: manha },
-  { k: "tarde", l: "☀️ Tarde", color: "var(--warn)", v: tarde },
-  { k: "noite", l: "🌙 Noite", color: "var(--cold)", v: noite },
+  { k: "manha", l: "🌅 Manhã", color: "var(--period-morning)", v: manha },
+  { k: "tarde", l: "☀️ Tarde", color: "var(--period-afternoon)", v: tarde },
+  { k: "noite", l: "🌙 Noite", color: "var(--period-night)", v: noite },
 ] as const;
 
 export function WeekChart({ hi, lo }: { hi: number; lo: number }) {
@@ -26,7 +26,7 @@ export function WeekChart({ hi, lo }: { hi: number; lo: number }) {
             <ReferenceLine y={hi} stroke="var(--fever)" strokeDasharray="5 4" label={{ value: "Febre", position: "insideTopRight", fill: "var(--fever)", fontSize: 12, fontWeight: 700 }} />
             <ReferenceLine y={lo} stroke="var(--cold)" strokeDasharray="5 4" label={{ value: "Frio", position: "insideBottomRight", fill: "var(--cold)", fontSize: 12, fontWeight: 700 }} />
             <XAxis dataKey="d" tickLine={false} axisLine={false} tick={{ fontSize: 13, fill: "var(--muted-foreground)" }} />
-            <YAxis domain={[27, 38]} ticks={[28, 30, 32, 34, 36, 38]} width={36} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
+            <YAxis domain={[24, 36]} ticks={[24, 26, 28, 30, 32, 34, 36]} width={36} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
             <Tooltip formatter={(v: number, n: string) => [c(v) + " °C", { manha: "Manhã", tarde: "Tarde", noite: "Noite" }[n]]}
               contentStyle={{ borderRadius: 16, border: "1px solid var(--border)", fontSize: 14 }} />
             {series.map((s) => (

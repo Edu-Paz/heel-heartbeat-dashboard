@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLiveTemp } from "@/lib/mqtt";
 import { Battery, LogOut, Bluetooth, ChevronRight, Settings2, Timer } from "lucide-react";
 import { Shell } from "@/components/Shell";
 import { WeekChart } from "@/components/WeekChart";
@@ -66,7 +67,7 @@ function Index() {
       </div>
       <div className="grid grid-cols-3 gap-1.5">
         {([["normal", "Normal", "32,8°", "bg-success"], ["hot", "Quente", "37,1°", "bg-fever"], ["cold", "Frio", "28,5°", "bg-cold"]] as const).map(([m, l, v, bg]) => (
-          <button key={m} onClick={() => { setMode(m); setAlertKey((k) => k + 1); }}
+          <button key={m} onClick={() => { setUseReal(false); setMode(m); setAlertKey((k) => k + 1); }}
             className={`min-h-12 rounded-xl text-sm font-bold text-primary-foreground transition ${bg} ${mode === m ? "ring-4 ring-clinical/30 scale-[1.03]" : "opacity-60"}`}>
             {l} {v}
           </button>
